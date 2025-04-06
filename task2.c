@@ -1,4 +1,4 @@
-#include "go.h"
+#include "task2.h"
 
 
 int ScanDirectory(const struct dirent **firstItem, const struct dirent **secondItem) 
