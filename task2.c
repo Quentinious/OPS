@@ -1,6 +1,7 @@
 #include "task2.h"
 
 
+
 int ScanDirectory(const struct dirent **firstItem, const struct dirent **secondItem) 
 {
     int res = strcmp((*firstItem)->d_name, (*secondItem)->d_name);
@@ -14,7 +15,7 @@ void getLs(const char *path)
     
     if (n == -1) 
     {
-        printf("scandir err");
+        printf("Error while scandir");
         return;
     }
     
@@ -76,21 +77,6 @@ void removeDirectory(const char *path)
 }
 
 
-void fileTouch(char *path) 
-{
-    int fd = open(path, O_CREAT | O_WRONLY, 0666);
-    if (fd == -1)
-    {
-        printf("cant open file");
-    }
-    else
-    {
-        close(fd);
-        printf("successfully created file: %s\n", path);
-    }
-}
-
-
 void createDir(const char *path)
 {
     if (mkdir(path, 0777) == -1)
@@ -129,6 +115,22 @@ void fileCat(char *path)
 }
 
 
+void fileTouch(char *path) 
+{
+    int fd = open(path, O_CREAT | O_WRONLY, 0666);
+    if (fd == -1)
+    {
+        printf("cant open file");
+    }
+    else
+    {
+        close(fd);
+        printf("successfully created file: %s\n", path);
+    }
+}
+
+
+
 void removeFile(char *path)
 {
     if (unlink(path) == -1)
@@ -140,6 +142,16 @@ void removeFile(char *path)
         printf("successfully removed file: %s\n", path);
     }
 }
+
+
+void createSymlink(char *path, char *linkPath)
+{
+    if (symlink(path, linkPath) == -1)
+    {
+        printf("Error cant create symLink ");
+    }
+}
+
 
 const char* getTypeOfByte(mode_t mode) 
 {
@@ -161,15 +173,6 @@ const char* getTypeOfByte(mode_t mode)
 }
 
 
-void createSymlink(char *path, char *linkPath)
-{
-    if (symlink(path, linkPath) == -1)
-    {
-        printf("error cant create symLink ");
-    }
-}
-
-
 void readSymlink(char *path)
 {
     char buffer[PAGESIZE];
@@ -184,6 +187,15 @@ void readSymlink(char *path)
 }
 
 
+void removeSymlink(char *path) 
+{
+    if (unlink(path) == -1) 
+    {
+        printf("Error remove synlink");
+    }
+}
+
+
 void readFileFromSymlink(char *path)
 {
     char buffer[PAGESIZE];
@@ -191,20 +203,11 @@ void readFileFromSymlink(char *path)
     int len = readlink(path, targetPath, sizeof(targetPath) - 1);
     if (len == -1) 
     {
-        printf("error read sym link try again");
+        printf("Error in proccess to read symlink");
         return;
     }
     targetPath[len] = '\0';
     fileCat(targetPath);
-}
-
-
-void removeSymlink(char *path) 
-{
-    if (unlink(path) == -1) 
-    {
-        printf("error remove synlink");
-    }
 }
 
 void createHardLink(char *path, char *linkPath) 
@@ -215,25 +218,12 @@ void createHardLink(char *path, char *linkPath)
     }
 }
 
-void removeHardLink(char *path) 
-{
-    if (unlink(path) == -1) 
-    {
-        printf("error delete link to hard");
-    }
-    else
-    {
-        printf("successfully removed hard link: %s\n", path);
-    }
-}
-
-
 void getChmod(const char *path)
 {
     struct stat st;
     if (stat(path, &st) == -1)
     {
-        printf("error getChmod");
+        printf("error getPermit");
         return;
     }
     printf("type file-> %s\n", getTypeOfByte(st.st_mode));
@@ -252,6 +242,21 @@ void getChmod(const char *path)
     printf("status -> %s\n", rwx);
     printf("quanity of links -> %ld\n", st.st_nlink);
 }
+
+
+void removeHardLink(char *path) 
+{
+    if (unlink(path) == -1) 
+    {
+        printf("error delete link to hard");
+    }
+    else
+    {
+        printf("successfully removed hard link: %s\n", path);
+    }
+}
+
+
 
 void setPermitChmod(const char *path, mode_t mode) 
 {
@@ -281,5 +286,116 @@ char* getLastSlashInPath(char* input)
 char* extractFileNameFromPath(char path[])
 { 
     char *lastSlash = getLastSlashInPath(path);  
-    return (lastSlash != NULL) ? lastSlash + 1 : path;
+    return ((lastSlash != NULL) ? lastSlash + 1 : path);
 }
+
+int main(int argc, char *argv[]) 
+{
+    if (argc < 2) 
+    {
+        printf("error %s please try again\n", argv[0]);
+        return 1;
+    }
+    
+    char* commandName = extractFileNameFromPath(argv[0]);
+    if (commandName == NULL)
+    {
+        printf("there is must be command\n");
+        return 1;
+    }
+
+    if (!strcmp(commandName, "mkdir")) 
+    {
+        createDir(argv[1]);
+    }
+    else if (!strcmp(commandName, "ls")) 
+    {
+        getLs(argv[1]);
+    } 
+    else if (!strcmp(commandName, "rmdir"))
+     {
+        removeDirectory(argv[1]);
+    } 
+    else if (!strcmp(commandName, "touch"))
+    {
+        fileTouch(argv[1]);
+    } 
+    else if (!strcmp(commandName, "cat"))
+    {
+        fileCat(argv[1]);
+    } 
+    else if (!strcmp(commandName, "rm")) 
+    {
+        removeFile(argv[1]);
+    }
+    else if (!strcmp(commandName, "stat"))
+    {
+        getChmod(argv[1]);
+    } 
+    else if (!strcmp(commandName, "chmod")) 
+    {
+        if (argc != 3)
+        {
+            return 1;
+        }
+        setPermitChmod(argv[1], strtol(argv[2], NULL, 8));
+    } 
+    else if (!strcmp(commandName, "lns"))
+    {
+        if (argc != 3)
+        {
+            return 1;
+        }
+        createSymlink(argv[1], argv[2]);
+    } 
+    else if (!strcmp(commandName, "catln")) 
+    {
+        if (argc != 2) 
+        {
+            return 1;
+        }
+        readSymlink(argv[1]);
+    } 
+    else if (!strcmp(commandName, "catlnfile")) 
+    {
+        if (argc != 2) 
+        {
+            return 1;
+        }
+        readFileFromSymlink(argv[1]);
+    } 
+    else if (!strcmp(commandName, "unlink")) 
+    {
+        if (argc != 2) 
+        {
+            return 1;
+        }
+        removeSymlink(argv[1]);
+    }
+    else if (!strcmp(commandName, "ln"))
+    {
+        if (argc != 3)
+        {
+            return 1;
+        }
+        createHardLink(argv[1], argv[2]);
+    }
+
+    else if 
+    (!strcmp(commandName, "unlinkhard"))
+    {
+        if (argc != 2) 
+        {
+            return 1;
+        }
+        removeHardLink(argv[1]);
+    }
+    else
+    {
+        printf("Unknown command\n");
+    }
+    
+    return 0;
+    
+}
+
