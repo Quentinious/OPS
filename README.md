@@ -1,2 +1,2 @@
 # OPS
-operation systems
+operating systems
