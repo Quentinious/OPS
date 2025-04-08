@@ -1,11 +1,6 @@
 #include "task2.c"
 
 
-
-
-
-
-
 int main(int argc, char *argv[]) 
 {
     if (argc < 2) 
@@ -29,19 +24,24 @@ int main(int argc, char *argv[])
     {
         getLs(argv[1]);
     } 
-    else if (!strcmp(commandName, "rmdir")) {
+    else if (!strcmp(commandName, "rmdir"))
+    {
         removeDirectory(argv[1]);
     } 
-    else if (!strcmp(commandName, "touch")) {
+    else if (!strcmp(commandName, "touch"))
+    {
         fileTouch(argv[1]);
     } 
-    else if (!strcmp(commandName, "cat")) {
+    else if (!strcmp(commandName, "cat")) 
+    {
         fileCat(argv[1]);
     } 
-    else if (!strcmp(commandName, "rm")) {
+    else if (!strcmp(commandName, "rm")) 
+    {
         removeFile(argv[1]);
     }
-    else if (!strcmp(commandName, "stat")) {
+    else if (!strcmp(commandName, "stat")) 
+    {
         getChmod(argv[1]);
     } 
     else if (!strcmp(commandName, "chmod")) 
