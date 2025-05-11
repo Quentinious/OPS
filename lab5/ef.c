@@ -8,7 +8,6 @@
 int main(void) 
 {
   const int sizeBuffer = 100;
-  // i
   char *buffer = (char* )calloc(sizeBuffer, sizeof(char));
   if(!buffer) 
   {
